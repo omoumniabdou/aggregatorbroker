@@ -14,11 +14,11 @@ class SqlWriter:
                                 database=self.configuration["database"])
 
     def update_loading_rate(self, machine_id, time_stamp, load_rate, mileage):
-        logging.debug("updating loading_rate table")
+        logging.debug("updating machine_statistic table")
         connection = self.get_connection()
         cursor = connection.cursor()
         cursor.execute("""
-            INSERT INTO loading_rate (machine_id, time_stamp, load_rate, mileage)
+            INSERT INTO machine_statistic (machine_id, timestamp, load_rate, mileage)
             VALUES (%s,%s,%s, %s)
         """,
                        (machine_id, time_stamp, load_rate, mileage))

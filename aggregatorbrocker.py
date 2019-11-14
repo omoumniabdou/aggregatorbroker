@@ -10,7 +10,7 @@ if __name__ == '__main__':
 
     # configuration
     configuration = ConfigParser()
-    configuration.read("configuration.ini")
+    configuration.read("configuration.conf")
 
     mqtt_client = agbro.MqttClient(configuration["mqtt"])
     sql_writer = agbro.SqlWriter(configuration["sql"])
