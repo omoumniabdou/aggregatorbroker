@@ -22,4 +22,5 @@ class MqttClient:
         client.subscribe(topic)
 
     def _on_message(self, client, userdata, msg):
+        ts_reception = msg.timestamp  # maybe we could use msg.timestamp?
         logging.debug(msg.topic + " " + str(msg.payload))
