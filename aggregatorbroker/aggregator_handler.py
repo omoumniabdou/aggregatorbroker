@@ -56,9 +56,10 @@ class AggregatorHandler(MessageHandler):
         :param msg_minute: the messages to aggregate
         """
         logging.info("Aggregate data of {} and write in the database".format(str(ts_minute)))
-        df = pd.DataFrame(msg_minute, index=[MACHINE, TS], columns=[LOAD_RATE, MILEAGE])
-        mean_grpby = df.groupBy(level=0).mean()
-        self.sql_writer.write(mean_grpby[MACHINE], ts_minute, mean_grpby[LOAD_RATE], mean_grpby[MILEAGE])
+        df = pd.DataFrame(msg_minute, columns=[MACHINE, TS, LOAD_RATE, MILEAGE])
+        mean_grpby = df.groupby([MACHINE]).mean()
+        mean_grpby.insert(0, TS, ts_minute)
+        self.sql_writer.write(mean_grpby)
 
     def _sleep(self, next_minute: datetime):
         """
@@ -100,7 +101,7 @@ class AggregatorHandler(MessageHandler):
         # we do not take into account messages where the timestamp is in the future
         # we only handle past messages with a delay of 1 seconds
         if ts_reception >= ts:
-            # TODO here we should check message integrity
+            # TODO here we should check message integrity (see NOTES.md)
             machine = int(message[MACHINE])
             load_rate = float(message[LOAD_RATE])
             mileage = float(message[MILEAGE])
