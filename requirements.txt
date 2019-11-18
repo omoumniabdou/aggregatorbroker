@@ -1,3 +1,5 @@
+pytz
+pandas
 paho-mqtt
 configparser
 psycopg2

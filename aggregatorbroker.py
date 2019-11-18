@@ -1,7 +1,7 @@
 import logging.config
 from configparser import ConfigParser
 
-import aggregatorbrocker as agbro
+import aggregatorbroker as agbro
 
 if __name__ == '__main__':
     # logging
@@ -12,5 +12,6 @@ if __name__ == '__main__':
     configuration = ConfigParser()
     configuration.read("configuration.conf")
 
-    mqtt_client = agbro.MqttClient(configuration["mqtt"])
     sql_writer = agbro.SqlWriter(configuration["sql"])
+    handler = agbro.AggregatorHandler(sql_writer)
+    mqtt_client = agbro.MqttClient(configuration["mqtt"], handler)
