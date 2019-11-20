@@ -36,7 +36,7 @@ for the easy API for aggregation `groupby` and sql writing `to_sql`. The diction
   
  
  # Testing
- - We should create fake broker for unit test where the results are known. It should include special cases to check 
+ We should create fake broker for unit test where the results are known. It should include special cases to check 
  message integrity and using different time zones
  
  # Why python?

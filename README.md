@@ -7,7 +7,7 @@ MQTT message broker that aggregates data to an SQL data base
 
 `$ pip install .`
 
--The configuration [configuration.conf](configuration.conf) file contains the configuration of:
+- The configuration [configuration.conf](configuration.conf) file contains the configuration of:
  - The database
  - The MQTT 
  - The message handler
