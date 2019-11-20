@@ -10,18 +10,20 @@ configuration.read(configuration_path)
 
 sql_conf = configuration["sql"]
 
-connection = psycopg2.connect(user=sql_conf["user"],
-                              password=sql_conf["password"],
-                              port=int(sql_conf["port"]),
-                              database=sql_conf["database"])
-
-query = open('init_db.sql', 'r').read()
-cursor = connection.cursor()
+connection = None
 try:
+    connection = psycopg2.connect(user=sql_conf["user"],
+                                  password=sql_conf["password"],
+                                  port=int(sql_conf["port"]),
+                                  database=sql_conf["database"])
+
+    query = open('init_db.sql', 'r').read()
+    cursor = connection.cursor()
     # Create table - machine_stats
     cursor.execute(query)
     connection.commit()
+    cursor.close()
     print("database initialized")
 finally:
-    cursor.close()
-    connection.close()
+    if connection is not None:
+        connection.close()
