@@ -33,13 +33,18 @@ def next_minute(dt):
 
 
 def as_utc(dt):
+    """
+    Convert datetime to the UTC time zone
+    :param dt: the date time
+    :return: the converted date time
+    """
     return dt.astimezone(tz=pytz.utc)
 
 
 def now():
     """
     The now date time in the UTC time zone
-    :return:
+    :return: the now date time
     """
     return as_utc(datetime.now())
 

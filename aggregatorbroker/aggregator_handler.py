@@ -11,9 +11,10 @@ from constants import *
 from sql_writer import SqlWriter
 
 
+
 class MessageHandler:
     """
-    Class that handles messages received using a message broker
+    Class that handles the messages
     """
 
     def handle_message(self, ts_reception: datetime, message_str: str):
@@ -26,10 +27,14 @@ class MessageHandler:
 
 
 class AggregatorHandler(MessageHandler):
+    """
+    Implementation of MessageHandler that aggregates the messages before writing them into a database
+    """
 
-    def __init__(self, sql_writer: SqlWriter, mqtt_delay: int = 1):
+    def __init__(self, configuration, sql_writer: SqlWriter):
+        self.configuration = configuration
         self.sql_writer = sql_writer
-        self.mqtt_delay = timedelta(seconds=mqtt_delay)
+        self.mqtt_delay = timedelta(seconds=int(configuration[MQTT_DELAY]))
         self.messages = {}
         self.previous_minute = utils.extract_datetime_minute(utils.now())
         # create a thread that will aggregate messages each minutes and write them to the data base
@@ -37,6 +42,10 @@ class AggregatorHandler(MessageHandler):
         agg_thread.start()
 
     def _aggregate_messages(self):
+        """
+        Runnable that will loop forever to aggregate the messages each minute and write them to the database
+        :return:
+        """
         # first time we need to wait to the end of the first minute
         self._sleep(utils.next_minute(self.previous_minute))
         while True:
@@ -56,6 +65,7 @@ class AggregatorHandler(MessageHandler):
         :param msg_minute: the messages to aggregate
         """
         logging.info("Aggregate data of {} and write in the database".format(str(ts_minute)))
+        # we use pandas for the data aggregation and sql writing for the sake of simplicity
         df = pd.DataFrame(msg_minute, columns=[MACHINE, TS, LOAD_RATE, MILEAGE])
         mean_grpby = df.groupby([MACHINE]).mean()
         mean_grpby.insert(0, TS, ts_minute)
@@ -100,10 +110,10 @@ class AggregatorHandler(MessageHandler):
         ts = utils.parse_datetime(message[TS])  # transform to a datetime
         # we do not take into account messages where the timestamp is in the future
         # we only handle past messages with a delay of 1 seconds
-        if ts_reception >= ts:
+        if not self.configuration['skip_future_message'] == 'True' or ts_reception >= ts:
             # TODO here we should check message integrity (see NOTES.md)
             machine = int(message[MACHINE])
             load_rate = float(message[LOAD_RATE])
             mileage = float(message[MILEAGE])
             return [machine, ts, load_rate, mileage]
-        logging.debug("The message {} has not been processed due to integrity error ".format(message))
+        logging.warning("The following message was ignored as the time stamp is in the future {}".format(message))
