@@ -19,6 +19,10 @@ a composite primary key (machine, ts) but this can be discussed.
    - Absent fields (machine, ts, load_rate, mileage) or incorrect data type
    - negative mileage, load_rate not between 0 and 100
    - fields with NaN. we should define what is the behavior here (skip the message?)
+
+__Note__: I added an option to enable/disable skipping future messages as the 'fake' topic was always sending messages with
+ a future timestamp.
+
  
  ## Asynchronous task
  Messages are stored in an intermediate structure before being aggregated and written to the database. 
